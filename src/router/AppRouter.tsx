@@ -9,6 +9,8 @@ import { AppBar, Toolbar, Typography, Container } from '@mui/material';
 
 import { Dashboard, CategoryView } from '../pages';
 import { LoadingSpinner, ErrorAlert } from '../components/ui';
+import { AddResultForm } from '../components/forms';
+import { NotificationContainer } from '../components/notifications';
 
 const Layout: React.FC = () => {
   return (
@@ -21,6 +23,9 @@ const Layout: React.FC = () => {
         </Toolbar>
       </AppBar>
       <Outlet />
+
+      <AddResultForm />
+      <NotificationContainer />
     </>
   );
 };
