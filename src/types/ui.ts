@@ -1,6 +1,11 @@
 // Типы для UI компонентов и состояния интерфейса
 
-import type { CategoryType } from './analysis';
+import type { TooltipProps } from 'recharts';
+import type { CategoryType, ChartDataPoint } from './analysis';
+import type {
+  NameType,
+  ValueType,
+} from 'recharts/types/component/DefaultTooltipContent';
 
 // Состояние UI приложения
 export interface UIState {
@@ -74,4 +79,17 @@ export interface AnalysisFilters {
 export interface SortOptions {
   field: 'date' | 'value' | 'parameter';
   direction: 'asc' | 'desc';
+}
+
+interface TooltipPayload {
+  value: number;
+  dataKey: string;
+  payload: ChartDataPoint;
+}
+
+// Типизированные пропсы для CustomTooltip
+export interface CustomTooltipProps extends TooltipProps<ValueType, NameType> {
+  active?: boolean;
+  payload?: TooltipPayload[];
+  label?: string;
 }
