@@ -13,7 +13,7 @@ export type CategoryType =
 // Статус результата относительно нормы
 export type NormalStatus = 'normal' | 'high' | 'low' | 'attention';
 
-// Результат анализа
+// Интерфейс результата анализа
 export interface AnalysisResult {
   id: string;
   categoryId: CategoryType;
@@ -24,14 +24,15 @@ export interface AnalysisResult {
   notes?: string;
   createdAt?: string; // Когда добавлен в систему
   updatedAt?: string; // Когда последний раз изменен
+  importedAt?: string; // Когда импортирован из файла
   isHistorical?: boolean; // Захардкоженные исторические данные
 }
 
-// Параметр анализа
+// Интерфейс параметра анализа
 export interface Parameter {
   id: string;
   name: string;
-  shortName?: string;
+  shortName?: string; // Краткое название
   unit: string;
   normalRange: NormalRange;
   category: CategoryType;

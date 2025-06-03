@@ -1,6 +1,5 @@
 import type { AnalysisResult, HistoricalDataSet } from '../types';
 
-// Здесь будут ваши захардкоженные данные анализов
 export const HISTORICAL_DATA: HistoricalDataSet = {
   patientInfo: {
     name: 'Ирина Н.',
