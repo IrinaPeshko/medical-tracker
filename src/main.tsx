@@ -1,14 +1,14 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { Provider } from 'react-redux'
-import { ThemeProvider } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import 'dayjs/locale/ru'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/ru';
 
-import { store } from './store'
-import App from './App.tsx'
+import { store } from './store';
+import App from './App.tsx';
 
 import { createTheme } from '@mui/material/styles';
 
@@ -30,5 +30,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </LocalizationProvider>
       </ThemeProvider>
     </Provider>
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);

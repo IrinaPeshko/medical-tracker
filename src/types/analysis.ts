@@ -1,14 +1,14 @@
 // Основные типы для медицинских анализов
 
 // Типы категорий анализов
-export type CategoryType = 
-  | 'blood_general'      // Общий анализ крови
+export type CategoryType =
+  | 'blood_general' // Общий анализ крови
   | 'blood_biochemistry' // Биохимия крови
-  | 'hormones'          // Гормональные исследования
-  | 'vitamins'          // Витамины
-  | 'gynecology'        // Гинекологические анализы
-  | 'ultrasound'        // УЗИ исследования
-  | 'cytology';         // Цитологические исследования
+  | 'hormones' // Гормональные исследования
+  | 'vitamins' // Витамины
+  | 'gynecology' // Гинекологические анализы
+  | 'ultrasound' // УЗИ исследования
+  | 'cytology'; // Цитологические исследования
 
 // Статус результата относительно нормы
 export type NormalStatus = 'normal' | 'high' | 'low' | 'attention';
@@ -46,7 +46,7 @@ export interface NormalRange {
   max?: number;
   reference?: string; // Для качественных показателей
   femaleRange?: { min?: number; max?: number }; // Для женщин
-  maleRange?: { min?: number; max?: number };   // Для мужчин
+  maleRange?: { min?: number; max?: number }; // Для мужчин
   ageDependent?: boolean;
   cycleDependent?: boolean; // Зависит от фазы цикла
 }

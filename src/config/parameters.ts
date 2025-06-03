@@ -1,4 +1,4 @@
-import type { Parameter } from "../types/analysis";
+import type { Parameter } from '../types/analysis';
 
 export const PARAMETERS: Parameter[] = [
   // ===== ОБЩИЙ АНАЛИЗ КРОВИ =====
@@ -9,34 +9,43 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 4.0, max: 9.0 },
     category: 'blood_general',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'rbc',
     name: 'Эритроциты (RBC)',
     unit: 'x10^12/л',
-    normalRange: { femaleRange: { min: 3.7, max: 4.7 }, maleRange: { min: 4.0, max: 5.1 } },
+    normalRange: {
+      femaleRange: { min: 3.7, max: 4.7 },
+      maleRange: { min: 4.0, max: 5.1 },
+    },
     category: 'blood_general',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'hgb',
     name: 'Гемоглобин (HGB)',
     unit: 'г/л',
-    normalRange: { femaleRange: { min: 120, max: 150 }, maleRange: { min: 130, max: 170 } },
+    normalRange: {
+      femaleRange: { min: 120, max: 150 },
+      maleRange: { min: 130, max: 170 },
+    },
     category: 'blood_general',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'hct',
     name: 'Гематокрит (HCT)',
     unit: '%',
-    normalRange: { femaleRange: { min: 33, max: 46 }, maleRange: { min: 39, max: 49 } },
+    normalRange: {
+      femaleRange: { min: 33, max: 46 },
+      maleRange: { min: 39, max: 49 },
+    },
     category: 'blood_general',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'mcv',
@@ -45,7 +54,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 78, max: 98 },
     category: 'blood_general',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'mch',
@@ -54,7 +63,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 27, max: 32 },
     category: 'blood_general',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'mchc',
@@ -63,7 +72,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 320, max: 360 },
     category: 'blood_general',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'rdw_cv',
@@ -72,7 +81,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 11.5, max: 14.5 },
     category: 'blood_general',
     importance: 'low',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'plt',
@@ -81,16 +90,19 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 150, max: 450 },
     category: 'blood_general',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'esr',
     name: 'Скорость оседания эритроцитов (СОЭ)',
     unit: 'мм/час',
-    normalRange: { femaleRange: { min: 2, max: 15 }, maleRange: { min: 2, max: 10 } },
+    normalRange: {
+      femaleRange: { min: 2, max: 15 },
+      maleRange: { min: 2, max: 10 },
+    },
     category: 'blood_general',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
 
   // Лейкоцитарная формула
@@ -101,7 +113,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 1.7, max: 7.7 },
     category: 'blood_general',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'lymphocytes_abs',
@@ -110,16 +122,16 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 1.2, max: 3.5 },
     category: 'blood_general',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'monocytes_abs',
     name: 'Моноциты (абс.)',
     unit: 'x10^9/л',
-    normalRange: { min: 0.09, max: 0.60 },
+    normalRange: { min: 0.09, max: 0.6 },
     category: 'blood_general',
     importance: 'low',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'eosinophils_abs',
@@ -128,7 +140,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 0.04, max: 0.35 },
     category: 'blood_general',
     importance: 'low',
-    isNumeric: true
+    isNumeric: true,
   },
 
   // ===== БИОХИМИЯ КРОВИ =====
@@ -139,16 +151,19 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 3.8, max: 6.1 },
     category: 'blood_biochemistry',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'ferritin',
     name: 'Ферритин',
     unit: 'мкг/л',
-    normalRange: { femaleRange: { min: 5.5, max: 94.0 }, maleRange: { min: 12, max: 300 } },
+    normalRange: {
+      femaleRange: { min: 5.5, max: 94.0 },
+      maleRange: { min: 12, max: 300 },
+    },
     category: 'blood_biochemistry',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
 
   // ===== ГОРМОНЫ =====
@@ -159,16 +174,16 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 18.0, max: 391.0 } },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'oh_progesterone',
     name: '17-гидроксипрогестерон',
     unit: 'нг/мл',
-    normalRange: { min: 0.10, max: 0.80, cycleDependent: true },
+    normalRange: { min: 0.1, max: 0.8, cycleDependent: true },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'ttg',
@@ -177,7 +192,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { min: 0.4, max: 4.0 },
     category: 'hormones',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'prolactin',
@@ -186,7 +201,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 4.8, max: 23.3 }, cycleDependent: true },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'lh',
@@ -195,7 +210,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 2.4, max: 12.6 }, cycleDependent: true },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'fsh',
@@ -204,7 +219,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 3.5, max: 12.5 }, cycleDependent: true },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'estradiol',
@@ -213,7 +228,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 12.5, max: 166 }, cycleDependent: true },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'testosterone_total',
@@ -222,7 +237,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 0.06, max: 0.82 } },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'androstenedione',
@@ -231,7 +246,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 0.7, max: 2.7 } },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'shbg',
@@ -240,7 +255,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 26.1, max: 110 } },
     category: 'hormones',
     importance: 'medium',
-    isNumeric: true
+    isNumeric: true,
   },
   {
     id: 'amh',
@@ -249,7 +264,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { femaleRange: { min: 1.0, max: 2.5 } },
     category: 'hormones',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
 
   // ===== ВИТАМИНЫ =====
@@ -257,10 +272,15 @@ export const PARAMETERS: Parameter[] = [
     id: 'vitamin_d',
     name: 'Витамин D общий',
     unit: 'нг/мл',
-    normalRange: { min: 30, max: 100, reference: '<20 - дефицит; 20-29 - недостаточность; 30-100 - оптимальный уровень' },
+    normalRange: {
+      min: 30,
+      max: 100,
+      reference:
+        '<20 - дефицит; 20-29 - недостаточность; 30-100 - оптимальный уровень',
+    },
     category: 'vitamins',
     importance: 'high',
-    isNumeric: true
+    isNumeric: true,
   },
 
   // ===== ГИНЕКОЛОГИЧЕСКИЕ АНАЛИЗЫ =====
@@ -271,7 +291,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { reference: 'не обнаружено' },
     category: 'gynecology',
     importance: 'high',
-    isNumeric: false
+    isNumeric: false,
   },
   {
     id: 'femoflor_screen',
@@ -280,7 +300,7 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { reference: 'нормоценоз' },
     category: 'gynecology',
     importance: 'medium',
-    isNumeric: false
+    isNumeric: false,
   },
 
   // ===== ЦИТОЛОГИЯ =====
@@ -291,16 +311,16 @@ export const PARAMETERS: Parameter[] = [
     normalRange: { reference: 'NILM (норма)' },
     category: 'cytology',
     importance: 'high',
-    isNumeric: false
-  }
+    isNumeric: false,
+  },
 ];
 
 // Получение параметра по ID
 export const getParameterById = (id: string): Parameter | undefined => {
-  return PARAMETERS.find(param => param.id === id);
+  return PARAMETERS.find((param) => param.id === id);
 };
 
 // Получение параметров по категории
 export const getParametersByCategory = (categoryId: string): Parameter[] => {
-  return PARAMETERS.filter(param => param.category === categoryId);
+  return PARAMETERS.filter((param) => param.category === categoryId);
 };

@@ -1,4 +1,4 @@
-import type { Category } from "../types/analysis";
+import type { Category } from '../types/analysis';
 
 export const CATEGORIES: Category[] = [
   {
@@ -8,7 +8,7 @@ export const CATEGORIES: Category[] = [
     icon: 'BloodtypeIcon',
     color: '#d32f2f',
     frequency: 'раз в 6 месяцев',
-    order: 1
+    order: 1,
   },
   {
     id: 'blood_biochemistry',
@@ -17,7 +17,7 @@ export const CATEGORIES: Category[] = [
     icon: 'ScienceIcon',
     color: '#1976d2',
     frequency: 'раз в год',
-    order: 2
+    order: 2,
   },
   {
     id: 'hormones',
@@ -26,7 +26,7 @@ export const CATEGORIES: Category[] = [
     icon: 'BiotechIcon',
     color: '#7b1fa2',
     frequency: 'по показаниям',
-    order: 3
+    order: 3,
   },
   {
     id: 'vitamins',
@@ -35,7 +35,7 @@ export const CATEGORIES: Category[] = [
     icon: 'MedicationIcon',
     color: '#388e3c',
     frequency: 'раз в год',
-    order: 4
+    order: 4,
   },
   {
     id: 'gynecology',
@@ -44,7 +44,7 @@ export const CATEGORIES: Category[] = [
     icon: 'FavoriteIcon',
     color: '#e91e63',
     frequency: 'раз в год',
-    order: 5
+    order: 5,
   },
   {
     id: 'ultrasound',
@@ -53,7 +53,7 @@ export const CATEGORIES: Category[] = [
     icon: 'CameraAltIcon',
     color: '#0097a7',
     frequency: 'по показаниям',
-    order: 6
+    order: 6,
   },
   {
     id: 'cytology',
@@ -62,13 +62,13 @@ export const CATEGORIES: Category[] = [
     icon: 'VisibilityIcon',
     color: '#f57c00',
     frequency: 'раз в год',
-    order: 7
-  }
+    order: 7,
+  },
 ];
 
 // Получение категории по ID
 export const getCategoryById = (id: string): Category | undefined => {
-  return CATEGORIES.find(cat => cat.id === id);
+  return CATEGORIES.find((cat) => cat.id === id);
 };
 
 // Получение категорий в порядке отображения

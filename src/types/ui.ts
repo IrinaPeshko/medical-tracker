@@ -1,7 +1,6 @@
 // Типы для UI компонентов и состояния интерфейса
 
-import type { CategoryType } from "./analysis";
-
+import type { CategoryType } from './analysis';
 
 // Состояние UI приложения
 export interface UIState {
