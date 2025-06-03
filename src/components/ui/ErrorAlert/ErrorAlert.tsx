@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert, AlertTitle, Button, Box } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material/styles';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 
 interface ErrorAlertProps {
@@ -9,6 +10,7 @@ interface ErrorAlertProps {
   retryText?: string;
   severity?: 'error' | 'warning' | 'info';
   variant?: 'filled' | 'outlined' | 'standard';
+  sx?: SxProps<Theme>;
 }
 
 export const ErrorAlert: React.FC<ErrorAlertProps> = ({
@@ -18,6 +20,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
   retryText = 'Повторить',
   severity = 'error',
   variant = 'standard',
+  sx,
 }) => {
   return (
     <Alert
@@ -28,6 +31,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
         '& .MuiAlert-message': {
           width: '100%',
         },
+        ...sx,
       }}
     >
       {title && <AlertTitle>{title}</AlertTitle>}

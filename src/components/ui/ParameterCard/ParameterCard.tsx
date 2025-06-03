@@ -177,7 +177,7 @@ export const ParameterCard: React.FC<ParameterCardProps> = ({
                 <Chip
                   size="small"
                   label={getStatusText()}
-                  color={getStatusColor() as any}
+                  color={getStatusColor()}
                   sx={{ mt: 0.5, fontSize: '0.75rem' }}
                 />
               )}
