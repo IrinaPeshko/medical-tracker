@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import {
   Container,
   Grid,
@@ -22,29 +22,32 @@ import {
   selectAnalysisLoading,
   selectAnalysisError,
 } from '../../store/slices/analysisSlice';
-import {
-  selectSelectedCategory,
-  clearSelectedCategory,
-  openAddForm,
-} from '../../store/slices/uiSlice';
+import { openAddForm, setSelectedCategory } from '../../store/slices/uiSlice';
 import { CATEGORIES, PARAMETERS } from '../../config';
 import { ParameterCard, LoadingSpinner, ErrorAlert } from '../../components/ui';
 import type { AnalysisResult } from '../../types';
+import { useNavigation } from '../../hooks';
 
 export const CategoryView: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { currentCategoryId, goToDashboard } = useNavigation();
   const results = useAppSelector(selectAnalysisResults);
   const loading = useAppSelector(selectAnalysisLoading);
   const error = useAppSelector(selectAnalysisError);
-  const selectedCategoryId = useAppSelector(selectSelectedCategory);
 
-  const category = CATEGORIES.find((c) => c.id === selectedCategoryId);
+  const category = CATEGORIES.find((c) => c.id === currentCategoryId);
   const categoryParameters = PARAMETERS.filter(
-    (p) => p.category === selectedCategoryId
+    (p) => p.category === currentCategoryId
   );
 
+  useEffect(() => {
+    if (currentCategoryId) {
+      dispatch(setSelectedCategory(currentCategoryId));
+    }
+  }, [currentCategoryId, dispatch]);
+
   const handleBackToDashboard = () => {
-    dispatch(clearSelectedCategory());
+    goToDashboard();
   };
 
   const handleAddResult = () => {

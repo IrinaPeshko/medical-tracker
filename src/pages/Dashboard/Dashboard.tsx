@@ -26,11 +26,11 @@ import {
   selectAnalysisError,
 } from '../../store/slices/analysisSlice';
 import {
-  setSelectedCategory,
   openAddForm,
   openImportDialog,
   openExportDialog,
 } from '../../store/slices/uiSlice';
+import { useNavigation } from '../../hooks/useNavigation';
 import { CATEGORIES, PARAMETERS } from '../../config';
 import {
   StatCard,
@@ -43,13 +43,14 @@ import type { CategoryType } from '../../types/analysis';
 
 export const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { goToCategory } = useNavigation();
   const stats = useAppSelector(selectAnalysisStats);
   const results = useAppSelector(selectAnalysisResults);
   const loading = useAppSelector(selectAnalysisLoading);
   const error = useAppSelector(selectAnalysisError);
 
   const handleCategoryClick = (categoryId: CategoryType) => {
-    dispatch(setSelectedCategory(categoryId));
+    goToCategory(categoryId);
   };
 
   const handleAddResult = () => {
