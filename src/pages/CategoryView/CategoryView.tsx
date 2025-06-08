@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Container,
   Grid,
@@ -9,11 +9,15 @@ import {
   Breadcrumbs,
   Link,
   Fab,
+  Card,
+  CardContent,
+  Chip,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
   Add as AddIcon,
   Home as HomeIcon,
+  FilterList as FilterListIcon,
 } from '@mui/icons-material';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -25,8 +29,13 @@ import {
 import { openAddForm, setSelectedCategory } from '../../store/slices/uiSlice';
 import { CATEGORIES, PARAMETERS } from '../../config';
 import { ParameterCard, LoadingSpinner, ErrorAlert } from '../../components/ui';
-import type { AnalysisResult } from '../../types';
+import {
+  CategoryFilters,
+  type CategoryFilters as CategoryFiltersType,
+} from '../../components/analysis';
+import type { AnalysisResult, Parameter } from '../../types';
 import { useNavigation } from '../../hooks';
+import { AnalysisUtils } from '../../utils';
 
 export const CategoryView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +43,15 @@ export const CategoryView: React.FC = () => {
   const results = useAppSelector(selectAnalysisResults);
   const loading = useAppSelector(selectAnalysisLoading);
   const error = useAppSelector(selectAnalysisError);
+
+  const [filters, setFilters] = useState<CategoryFiltersType>({
+    dateRange: { start: null, end: null },
+    selectedParameters: [],
+    onlyAbnormal: false,
+    sortBy: 'date',
+    sortOrder: 'desc',
+    searchQuery: '',
+  });
 
   const category = CATEGORIES.find((c) => c.id === currentCategoryId);
   const categoryParameters = PARAMETERS.filter(
@@ -58,6 +76,148 @@ export const CategoryView: React.FC = () => {
     console.log('Clicked result:', result);
     // TODO: Открыть модал с деталями результата
   };
+
+  const handleFiltersChange = (newFilters: CategoryFiltersType) => {
+    setFilters(newFilters);
+  };
+
+  // Применяем фильтры к параметрам
+  const getFilteredParameters = (): Parameter[] => {
+    let filtered = [...categoryParameters];
+
+    // Фильтр по поисковому запросу
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      filtered = filtered.filter((param) =>
+        param.name.toLowerCase().includes(query)
+      );
+    }
+
+    // Фильтр по выбранным параметрам
+    if (filters.selectedParameters.length > 0) {
+      filtered = filtered.filter((param) =>
+        filters.selectedParameters.includes(param.id)
+      );
+    }
+
+    // Фильтр "только отклонения"
+    if (filters.onlyAbnormal) {
+      filtered = filtered.filter((param) => {
+        const latest = AnalysisUtils.getLatestResult(results, param.id);
+        return (
+          latest &&
+          AnalysisUtils.checkNormal(latest.value, param.id, 'female') !==
+            'normal'
+        );
+      });
+    }
+
+    // Сортировка
+    filtered.sort((a, b) => {
+      switch (filters.sortBy) {
+        case 'parameter': {
+          const nameComparison = a.name.localeCompare(b.name, 'ru');
+          return filters.sortOrder === 'asc' ? nameComparison : -nameComparison;
+        }
+
+        case 'value': {
+          const latestA = AnalysisUtils.getLatestResult(results, a.id);
+          const latestB = AnalysisUtils.getLatestResult(results, b.id);
+
+          if (!latestA && !latestB) return 0;
+          if (!latestA) return 1;
+          if (!latestB) return -1;
+
+          const valueA = typeof latestA.value === 'number' ? latestA.value : 0;
+          const valueB = typeof latestB.value === 'number' ? latestB.value : 0;
+
+          const valueComparison = valueA - valueB;
+          return filters.sortOrder === 'asc'
+            ? valueComparison
+            : -valueComparison;
+        }
+
+        case 'date':
+        default: {
+          const latestA = AnalysisUtils.getLatestResult(results, a.id);
+          const latestB = AnalysisUtils.getLatestResult(results, b.id);
+
+          if (!latestA && !latestB) return 0;
+          if (!latestA) return 1;
+          if (!latestB) return -1;
+
+          const dateComparison =
+            new Date(latestA.date).getTime() - new Date(latestB.date).getTime();
+          return filters.sortOrder === 'asc' ? dateComparison : -dateComparison;
+        }
+      }
+    });
+
+    return filtered;
+  };
+
+  // Фильтруем результаты по дате если задан диапазон
+  const getFilteredResults = (): AnalysisResult[] => {
+    let filtered = [...results];
+
+    if (filters.dateRange.start || filters.dateRange.end) {
+      filtered = filtered.filter((result) => {
+        const resultDate = new Date(result.date);
+
+        if (
+          filters.dateRange.start &&
+          resultDate < filters.dateRange.start.toDate()
+        ) {
+          return false;
+        }
+
+        if (
+          filters.dateRange.end &&
+          resultDate > filters.dateRange.end.toDate()
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    return filtered;
+  };
+
+  const filteredParameters = getFilteredParameters();
+  const filteredResults = getFilteredResults();
+
+  // Статистика после применения фильтров
+  const getFilteredStats = () => {
+    const categoryResults = filteredResults.filter(
+      (r) => r.categoryId === currentCategoryId
+    );
+
+    const abnormalParams = filteredParameters.filter((param) => {
+      const latest = AnalysisUtils.getLatestResult(filteredResults, param.id);
+      return (
+        latest &&
+        AnalysisUtils.checkNormal(latest.value, param.id, 'female') !== 'normal'
+      );
+    });
+
+    const lastResult = categoryResults.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    )[0];
+
+    return {
+      totalResults: categoryResults.length,
+      totalParameters: filteredParameters.length,
+      abnormalParameters: abnormalParams.length,
+      lastResultDate: lastResult?.date,
+      parametersWithData: filteredParameters.filter((param) =>
+        filteredResults.some((r) => r.parameterId === param.id)
+      ).length,
+    };
+  };
+
+  const stats = getFilteredStats();
 
   if (!category) {
     return (
@@ -140,14 +300,135 @@ export const CategoryView: React.FC = () => {
         />
       )}
 
+      {/* Статистика категории после фильтрации */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" gap={1} mb={2}>
+            <FilterListIcon color="action" />
+            <Typography variant="h6">
+              Статистика{' '}
+              {filters.dateRange.start ||
+              filters.dateRange.end ||
+              filters.selectedParameters.length > 0 ||
+              filters.onlyAbnormal ||
+              filters.searchQuery
+                ? '(с фильтрами)'
+                : ''}
+            </Typography>
+          </Box>
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <Typography variant="body2" color="textSecondary">
+                Параметров
+              </Typography>
+              <Typography variant="h6">
+                {stats.parametersWithData}/{stats.totalParameters}
+              </Typography>
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <Typography variant="body2" color="textSecondary">
+                Результатов
+              </Typography>
+              <Typography variant="h6">{stats.totalResults}</Typography>
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <Typography variant="body2" color="textSecondary">
+                Отклонений
+              </Typography>
+              <Typography
+                variant="h6"
+                color={stats.abnormalParameters > 0 ? 'error' : 'success.main'}
+              >
+                {stats.abnormalParameters}
+              </Typography>
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <Typography variant="body2" color="textSecondary">
+                Последний анализ
+              </Typography>
+              <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                {stats.lastResultDate
+                  ? new Date(stats.lastResultDate).toLocaleDateString('ru-RU')
+                  : 'Нет данных'}
+              </Typography>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Компонент фильтров */}
+      <CategoryFilters
+        parameters={categoryParameters}
+        onFiltersChange={handleFiltersChange}
+        initialFilters={filters}
+      />
+
+      {/* Индикаторы активных фильтров */}
+      {(filters.onlyAbnormal ||
+        filters.searchQuery ||
+        filters.selectedParameters.length > 0 ||
+        filters.dateRange.start ||
+        filters.dateRange.end) && (
+        <Box mb={3}>
+          <Typography variant="subtitle2" gutterBottom>
+            Активные фильтры:
+          </Typography>
+          <Box display="flex" gap={1} flexWrap="wrap">
+            {filters.onlyAbnormal && (
+              <Chip
+                label="Только отклонения"
+                color="error"
+                size="small"
+                onDelete={() =>
+                  handleFiltersChange({ ...filters, onlyAbnormal: false })
+                }
+              />
+            )}
+            {filters.searchQuery && (
+              <Chip
+                label={`Поиск: "${filters.searchQuery}"`}
+                color="primary"
+                size="small"
+                onDelete={() =>
+                  handleFiltersChange({ ...filters, searchQuery: '' })
+                }
+              />
+            )}
+            {filters.selectedParameters.length > 0 && (
+              <Chip
+                label={`Параметры: ${filters.selectedParameters.length}`}
+                color="primary"
+                size="small"
+                onDelete={() =>
+                  handleFiltersChange({ ...filters, selectedParameters: [] })
+                }
+              />
+            )}
+            {(filters.dateRange.start || filters.dateRange.end) && (
+              <Chip
+                label="Период задан"
+                color="primary"
+                size="small"
+                onDelete={() =>
+                  handleFiltersChange({
+                    ...filters,
+                    dateRange: { start: null, end: null },
+                  })
+                }
+              />
+            )}
+          </Box>
+        </Box>
+      )}
+
       {/* Параметры категории */}
-      {categoryParameters.length > 0 ? (
+      {filteredParameters.length > 0 ? (
         <Grid container spacing={3}>
-          {categoryParameters.map((parameter) => (
+          {filteredParameters.map((parameter) => (
             <Grid size={{ xs: 12 }} key={parameter.id}>
               <ParameterCard
                 parameter={parameter}
-                results={results}
+                results={filteredResults}
                 showChart={true}
                 compact={false}
                 onResultClick={handleResultClick}
@@ -158,20 +439,70 @@ export const CategoryView: React.FC = () => {
       ) : (
         <Box textAlign="center" py={8}>
           <Typography variant="h6" gutterBottom>
-            В этой категории пока нет параметров
+            {categoryParameters.length === 0
+              ? 'В этой категории пока нет параметров'
+              : 'Нет параметров, соответствующих фильтрам'}
           </Typography>
           <Typography variant="body1" color="textSecondary" paragraph>
-            Параметры для этой категории будут добавлены в будущих версиях
-            приложения.
+            {categoryParameters.length === 0
+              ? 'Параметры для этой категории будут добавлены в будущих версиях приложения.'
+              : 'Попробуйте изменить настройки фильтров или очистить их.'}
           </Typography>
-          <Button variant="outlined" onClick={handleBackToDashboard}>
-            Вернуться на главную
-          </Button>
+
+          {categoryParameters.length === 0 ? (
+            <Button variant="outlined" onClick={handleBackToDashboard}>
+              Вернуться на главную
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              onClick={() =>
+                handleFiltersChange({
+                  dateRange: { start: null, end: null },
+                  selectedParameters: [],
+                  onlyAbnormal: false,
+                  sortBy: 'date',
+                  sortOrder: 'desc',
+                  searchQuery: '',
+                })
+              }
+            >
+              Очистить фильтры
+            </Button>
+          )}
         </Box>
       )}
 
+      {/* Рекомендации для категории */}
+      {stats.abnormalParameters > 0 && (
+        <Card sx={{ mt: 4, border: '1px solid', borderColor: 'warning.main' }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom color="warning.main">
+              ⚠️ Рекомендации
+            </Typography>
+            <Typography variant="body2" paragraph>
+              В категории "{category.name}" обнаружено{' '}
+              {stats.abnormalParameters} параметров с отклонениями от нормы.
+              Рекомендуем:
+            </Typography>
+            <Box component="ul" sx={{ pl: 2, m: 0 }}>
+              <Typography component="li" variant="body2">
+                Обратиться к соответствующему специалисту для консультации
+              </Typography>
+              <Typography component="li" variant="body2">
+                Повторить анализы через рекомендуемый период:{' '}
+                {category.frequency}
+              </Typography>
+              <Typography component="li" variant="body2">
+                Отслеживать динамику показателей с отклонениями
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Дополнительная информация о категории */}
-      {categoryParameters.length > 0 && (
+      {filteredParameters.length > 0 && (
         <Box mt={4} sx={{ p: 3, bgcolor: 'grey.50', borderRadius: 2 }}>
           <Typography variant="h6" gutterBottom>
             О категории "{category.name}"
@@ -179,13 +510,13 @@ export const CategoryView: React.FC = () => {
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant="body2" color="textSecondary">
-                Параметров в категории
+                Всего параметров
               </Typography>
               <Typography variant="h6">{categoryParameters.length}</Typography>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant="body2" color="textSecondary">
-                Результатов в базе
+                Всего результатов
               </Typography>
               <Typography variant="h6">
                 {results.filter((r) => r.categoryId === category.id).length}

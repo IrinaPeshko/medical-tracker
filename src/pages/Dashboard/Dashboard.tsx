@@ -38,8 +38,25 @@ import {
   LoadingSpinner,
   ErrorAlert,
 } from '../../components/ui';
+import { GlobalSearch } from '../../components/search';
 import { AnalysisUtils } from '../../utils/analysisUtils';
-import type { CategoryType } from '../../types/analysis';
+import type {
+  AnalysisResult,
+  CategoryType,
+  Parameter,
+} from '../../types/analysis';
+
+interface SearchResult {
+  type: 'parameter' | 'result' | 'category';
+  id: string;
+  title: string;
+  subtitle: string;
+  category?: CategoryType;
+  status?: 'normal' | 'high' | 'low' | 'attention';
+  value?: string;
+  date?: string;
+  data: Parameter | AnalysisResult | (typeof CATEGORIES)[number];
+}
 
 export const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -63,6 +80,23 @@ export const Dashboard: React.FC = () => {
 
   const handleExport = () => {
     dispatch(openExportDialog());
+  };
+
+  const handleSearchResult = (result: SearchResult) => {
+    if (result.type === 'category') {
+      goToCategory(result.category!);
+    } else if (result.type === 'parameter') {
+      // Найдем категорию этого параметра и перейдем к ней
+      const param = PARAMETERS.find((p) => p.id === result.id);
+      if (param) {
+        goToCategory(param.category);
+      }
+    } else if (result.type === 'result') {
+      // Для результата тоже перейдем к его категории
+      if (result.category) {
+        goToCategory(result.category);
+      }
+    }
   };
 
   // Получаем рекомендации для пользователя
@@ -124,10 +158,11 @@ export const Dashboard: React.FC = () => {
       <Box
         display="flex"
         justifyContent="space-between"
-        alignItems="center"
+        alignItems="flex-start"
         mb={4}
+        gap={3}
       >
-        <Box>
+        <Box flex={1}>
           <Typography
             variant="h4"
             component="h1"
@@ -136,12 +171,15 @@ export const Dashboard: React.FC = () => {
           >
             Медицинский трекер
           </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
+          <Typography variant="subtitle1" color="textSecondary" sx={{ mb: 2 }}>
             Отслеживайте свое здоровье с помощью анализов
           </Typography>
+
+          {/* Глобальный поиск */}
+          <GlobalSearch onResultClick={handleSearchResult} />
         </Box>
 
-        <Box display="flex" gap={1}>
+        <Box display="flex" gap={1} flexShrink={0}>
           <Button
             variant="outlined"
             startIcon={<ImportIcon />}
@@ -239,7 +277,8 @@ export const Dashboard: React.FC = () => {
           Категории анализов
         </Typography>
         <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-          Выберите категорию для просмотра детальной информации
+          Выберите категорию для просмотра детальной информации или
+          воспользуйтесь поиском выше
         </Typography>
 
         <Grid container spacing={3}>
