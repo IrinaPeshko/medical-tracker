@@ -10,6 +10,7 @@ import { AppBar, Toolbar, Typography, Container } from '@mui/material';
 import { Dashboard, CategoryView } from '../pages';
 import { LoadingSpinner, ErrorAlert } from '../components/ui';
 import { AddResultForm } from '../components/forms';
+import { ExportDialog, ImportDialog } from '../components/dialogs';
 import { NotificationContainer } from '../components/notifications';
 
 const Layout: React.FC = () => {
@@ -24,7 +25,10 @@ const Layout: React.FC = () => {
       </AppBar>
       <Outlet />
 
+      {/* Глобальные диалоги и уведомления */}
       <AddResultForm />
+      <ExportDialog />
+      <ImportDialog />
       <NotificationContainer />
     </>
   );
