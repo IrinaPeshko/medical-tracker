@@ -43,7 +43,7 @@ import {
 } from '../../../store/slices/uiSlice';
 import { selectAnalysisResults } from '../../../store/slices/analysisSlice';
 import { CATEGORIES } from '../../../config';
-import { PDFExportService } from '../../../services/pdfExportService';
+import { ReactPDFExportService } from '../../../services/reactPdfExportService';
 import type { CategoryType } from '../../../types';
 
 type ExportFormat = 'json' | 'pdf';
@@ -99,7 +99,7 @@ export const ExportDialog: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [previewData, setPreviewData] = useState<any>(null);
+  const [_previewData, setPreviewData] = useState<any>(null);
 
   const handleClose = () => {
     if (isExporting) return;
@@ -113,34 +113,22 @@ export const ExportDialog: React.FC = () => {
 
   const updateOptions = (updates: Partial<ExportOptions>) => {
     setOptions((prev) => ({ ...prev, ...updates }));
-    setPreviewData(null); // Сброс превью при изменении опций
-  };
-
-  const updatePdfSettings = (
-    updates: Partial<ExportOptions['pdfSettings']>
-  ) => {
-    setOptions((prev) => ({
-      ...prev,
-      pdfSettings: { ...prev.pdfSettings, ...updates },
-    }));
+    setPreviewData(null);
   };
 
   const getFilteredResults = () => {
     let filtered = [...results];
 
-    // Фильтр по категориям
     if (options.selectedCategories.length > 0) {
       filtered = filtered.filter((r) =>
         options.selectedCategories.includes(r.categoryId)
       );
     }
 
-    // Фильтр по историческим данным
     if (!options.includeHistorical) {
       filtered = filtered.filter((r) => !r.isHistorical);
     }
 
-    // Фильтр по датам
     if (
       options.dateRange.enabled &&
       options.dateRange.start &&
@@ -184,20 +172,6 @@ export const ExportDialog: React.FC = () => {
           ? Math.round(filtered.length / categoriesWithData.size)
           : 0,
     };
-  };
-
-  const generatePreview = () => {
-    const filtered = getFilteredResults();
-    const stats = getExportStats();
-
-    setPreviewData({
-      results: filtered.slice(0, 5), // Первые 5 для превью
-      stats,
-      estimatedFileSize:
-        options.format === 'pdf'
-          ? `${Math.max(1, Math.round(filtered.length / 50))} МБ`
-          : `${Math.max(1, Math.round(filtered.length / 100))} КБ`,
-    });
   };
 
   const downloadFile = (blob: Blob, filename: string) => {
@@ -267,13 +241,13 @@ export const ExportDialog: React.FC = () => {
           includeStatistics: options.includeStatistics,
           includeTrends: options.includeTrends,
           title: 'Отчет по медицинским анализам',
-          ...options.pdfSettings,
         },
       };
 
       setExportProgress(50);
 
-      const blob = await PDFExportService.exportToPDF(exportData);
+      // Используем новый react-pdf сервис
+      const blob = await ReactPDFExportService.exportToPDF(exportData);
       setExportProgress(90);
 
       return blob;
@@ -294,7 +268,7 @@ export const ExportDialog: React.FC = () => {
         title: 'Медицинские анализы - Упрощенный отчет',
       };
 
-      return await PDFExportService.createSimplePDF(simpleData);
+      return await ReactPDFExportService.createSimplePDF(simpleData);
     }
   };
 
@@ -344,7 +318,7 @@ export const ExportDialog: React.FC = () => {
         dispatch(
           showSuccessNotification({
             title: 'PDF отчет создан успешно',
-            message: `Создан детальный PDF отчет с ${filtered.length} записями`,
+            message: `Создан детальный PDF отчет с ${filtered.length} записями с поддержкой русского языка`,
           })
         );
       }
@@ -353,7 +327,6 @@ export const ExportDialog: React.FC = () => {
       downloadFile(blob, filename);
       setExportProgress(100);
 
-      // Небольшая задержка для показа завершения
       setTimeout(() => {
         handleClose();
       }, 500);
@@ -437,7 +410,7 @@ export const ExportDialog: React.FC = () => {
                 <CircularProgress size={20} />
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {options.format === 'pdf'
-                    ? 'Создание PDF отчета...'
+                    ? 'Создание PDF отчета с поддержкой русского языка...'
                     : 'Подготовка JSON файла...'}
                 </Typography>
               </Box>
@@ -496,7 +469,7 @@ export const ExportDialog: React.FC = () => {
                           PDF отчет
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          Для просмотра и печати
+                          С поддержкой русского языка
                         </Typography>
                       </Box>
                     </Box>
@@ -513,7 +486,7 @@ export const ExportDialog: React.FC = () => {
             >
               {options.format === 'json'
                 ? 'JSON формат содержит все данные в структурированном виде и подходит для импорта в другие приложения или создания резервных копий.'
-                : 'PDF отчет создает красиво оформленный документ с таблицами, статистикой и анализом, который удобен для просмотра врачом.'}
+                : 'PDF отчет создается с использованием react-pdf для корректного отображения русского текста. Включает таблицы, статистику и красивое оформление.'}
             </Alert>
           </Box>
 
@@ -575,62 +548,33 @@ export const ExportDialog: React.FC = () => {
                 }
                 label={
                   <Box>
-                    <Typography variant="body2">Статистика</Typography>
+                    <Typography variant="body2">Статистика и сводки</Typography>
                     <Typography variant="caption" color="textSecondary">
-                      Сводная информация по категориям и трендам
+                      Общая статистика и сводная таблица по категориям
                     </Typography>
                   </Box>
                 }
               />
 
               {options.format === 'pdf' && (
-                <>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={options.includeTrends}
-                        onChange={(e) =>
-                          updateOptions({ includeTrends: e.target.checked })
-                        }
-                      />
-                    }
-                    label={
-                      <Box>
-                        <Typography variant="body2">Анализ трендов</Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          Динамика изменения показателей
-                        </Typography>
-                      </Box>
-                    }
-                  />
-
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={options.includeCharts}
-                        onChange={(e) =>
-                          updateOptions({ includeCharts: e.target.checked })
-                        }
-                        disabled // Пока не реализовано
-                      />
-                    }
-                    label={
-                      <Box>
-                        <Typography
-                          variant="body2"
-                          color={
-                            options.includeCharts ? 'inherit' : 'textSecondary'
-                          }
-                        >
-                          Графики (в разработке)
-                        </Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          Визуализация данных в PDF
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                </>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={options.includeTrends}
+                      onChange={(e) =>
+                        updateOptions({ includeTrends: e.target.checked })
+                      }
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body2">Анализ трендов</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Динамика изменения показателей для каждого параметра
+                      </Typography>
+                    </Box>
+                  }
+                />
               )}
             </Box>
           </Box>
@@ -749,69 +693,6 @@ export const ExportDialog: React.FC = () => {
                   </Box>
                 )}
               </Box>
-
-              {/* PDF настройки */}
-              {options.format === 'pdf' && (
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ mb: 2, fontWeight: 600 }}
-                  >
-                    Настройки PDF
-                  </Typography>
-                  <Box display="flex" gap={2} flexWrap="wrap">
-                    <FormControl size="small">
-                      <FormLabel>Размер страницы</FormLabel>
-                      <RadioGroup
-                        value={options.pdfSettings.paperSize}
-                        onChange={(e) =>
-                          updatePdfSettings({
-                            paperSize: e.target.value as 'a4' | 'letter',
-                          })
-                        }
-                        row
-                      >
-                        <FormControlLabel
-                          value="a4"
-                          control={<Radio />}
-                          label="A4"
-                        />
-                        <FormControlLabel
-                          value="letter"
-                          control={<Radio />}
-                          label="Letter"
-                        />
-                      </RadioGroup>
-                    </FormControl>
-
-                    <FormControl size="small">
-                      <FormLabel>Ориентация</FormLabel>
-                      <RadioGroup
-                        value={options.pdfSettings.orientation}
-                        onChange={(e) =>
-                          updatePdfSettings({
-                            orientation: e.target.value as
-                              | 'portrait'
-                              | 'landscape',
-                          })
-                        }
-                        row
-                      >
-                        <FormControlLabel
-                          value="portrait"
-                          control={<Radio />}
-                          label="Книжная"
-                        />
-                        <FormControlLabel
-                          value="landscape"
-                          control={<Radio />}
-                          label="Альбомная"
-                        />
-                      </RadioGroup>
-                    </FormControl>
-                  </Box>
-                </Box>
-              )}
             </Box>
           </Collapse>
 
@@ -831,7 +712,7 @@ export const ExportDialog: React.FC = () => {
               <Button
                 size="small"
                 startIcon={<PreviewIcon />}
-                onClick={generatePreview}
+                onClick={() => setPreviewData(getExportStats())}
                 disabled={stats.totalResults === 0}
               >
                 Обновить
@@ -904,17 +785,6 @@ export const ExportDialog: React.FC = () => {
                 </Typography>
               </Box>
             )}
-
-            {previewData && (
-              <Box mt={2} p={1} bgcolor="white" borderRadius={1}>
-                <Typography variant="caption" color="textSecondary">
-                  Ожидаемый размер файла:
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  {previewData.estimatedFileSize}
-                </Typography>
-              </Box>
-            )}
           </Paper>
 
           {/* Предупреждения */}
@@ -925,11 +795,11 @@ export const ExportDialog: React.FC = () => {
             </Alert>
           )}
 
-          {options.format === 'pdf' && stats.totalResults > 100 && (
+          {options.format === 'pdf' && stats.totalResults > 50 && (
             <Alert severity="info">
-              Большое количество данных ({stats.totalResults} записей) может
-              увеличить время создания PDF. Ожидаемое время: ~
-              {Math.ceil(stats.totalResults / 50)} секунд.
+              PDF будет создан с использованием react-pdf для корректного
+              отображения русского текста. Время создания: ~
+              {Math.ceil(stats.totalResults / 25)} секунд.
             </Alert>
           )}
         </Box>
@@ -953,7 +823,7 @@ export const ExportDialog: React.FC = () => {
           }
           disabled={isExporting || stats.totalResults === 0}
           sx={{
-            minWidth: 180,
+            minWidth: 200,
             '&:disabled': {
               bgcolor: 'action.disabledBackground',
             },
