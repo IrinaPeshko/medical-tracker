@@ -32,6 +32,7 @@ import {
 } from '../../../store/slices/uiSlice';
 import { importAnalysisData } from '../../../store/slices/analysisSlice';
 import { ValidationUtils } from '../../../utils';
+import type { AnalysisResult } from '../../../types';
 
 interface ImportStats {
   totalRecords: number;
@@ -106,7 +107,7 @@ export const ImportDialog: React.FC = () => {
 
       try {
         data = JSON.parse(text);
-      } catch (error) {
+      } catch {
         setValidationResult({
           isValid: false,
           errors: ['Файл содержит некорректный JSON'],
@@ -137,7 +138,7 @@ export const ImportDialog: React.FC = () => {
       const categories = new Set<string>();
       const dates: string[] = [];
 
-      results.forEach((record: any, index: number) => {
+      results.forEach((record: AnalysisResult, index: number) => {
         try {
           // Проверяем обязательные поля
           if (!record.parameterId) {
@@ -181,7 +182,7 @@ export const ImportDialog: React.FC = () => {
           categories.add(record.categoryId);
           dates.push(record.date);
           validCount++;
-        } catch (error) {
+        } catch {
           errors.push(`Запись ${index + 1}: ошибка валидации`);
         }
       });
@@ -216,7 +217,7 @@ export const ImportDialog: React.FC = () => {
         warnings,
         stats,
       });
-    } catch (error) {
+    } catch {
       setValidationResult({
         isValid: false,
         errors: ['Ошибка при обработке файла'],

@@ -28,7 +28,6 @@ import {
   Description as PdfIcon,
   Code as JsonIcon,
   Settings as SettingsIcon,
-  Preview as PreviewIcon,
 } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Dayjs } from 'dayjs';
@@ -44,7 +43,7 @@ import {
 import { selectAnalysisResults } from '../../../store/slices/analysisSlice';
 import { CATEGORIES } from '../../../config';
 import { ReactPDFExportService } from '../../../services/reactPdfExportService';
-import type { CategoryType } from '../../../types';
+import type { AnalysisResult, CategoryType } from '../../../types';
 
 type ExportFormat = 'json' | 'pdf';
 
@@ -99,7 +98,6 @@ export const ExportDialog: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [_previewData, setPreviewData] = useState<any>(null);
 
   const handleClose = () => {
     if (isExporting) return;
@@ -108,12 +106,10 @@ export const ExportDialog: React.FC = () => {
     setOptions(defaultOptions);
     setExportProgress(0);
     setShowAdvanced(false);
-    setPreviewData(null);
   };
 
   const updateOptions = (updates: Partial<ExportOptions>) => {
     setOptions((prev) => ({ ...prev, ...updates }));
-    setPreviewData(null);
   };
 
   const getFilteredResults = () => {
@@ -185,7 +181,7 @@ export const ExportDialog: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const generateJSONExport = (filtered: any[]) => {
+  const generateJSONExport = (filtered: AnalysisResult[]) => {
     const exportData = {
       metadata: {
         exportDate: new Date().toISOString(),
@@ -221,7 +217,7 @@ export const ExportDialog: React.FC = () => {
     return new Blob([jsonString], { type: 'application/json' });
   };
 
-  const generatePDFExport = async (filtered: any[]) => {
+  const generatePDFExport = async (filtered: AnalysisResult[]) => {
     try {
       setExportProgress(20);
 
@@ -709,14 +705,6 @@ export const ExportDialog: React.FC = () => {
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                 Предварительный просмотр
               </Typography>
-              <Button
-                size="small"
-                startIcon={<PreviewIcon />}
-                onClick={() => setPreviewData(getExportStats())}
-                disabled={stats.totalResults === 0}
-              >
-                Обновить
-              </Button>
             </Box>
 
             <Box
