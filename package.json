@@ -13,7 +13,9 @@
     "prettier:fix": "prettier --write .",
     "format": "npm run prettier:fix && npm run lint:fix",
     "type-check": "tsc --noEmit",
-    "check-all": "npm run type-check && npm run lint && npm run prettier"
+    "check-all": "npm run type-check && npm run lint && npm run prettier",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -50,6 +52,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
+    "gh-pages": "^6.3.0",
     "globals": "^16.0.0",
     "postcss": "^8.5.4",
     "prettier": "^3.5.3",
