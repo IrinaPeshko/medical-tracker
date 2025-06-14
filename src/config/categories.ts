@@ -64,6 +64,24 @@ export const CATEGORIES: Category[] = [
     frequency: 'раз в год',
     order: 7,
   },
+  {
+    id: 'urinalysis',
+    name: 'Клинический анализ мочи',
+    description: 'Исследование физико-химических и осадочных показателей мочи',
+    icon: 'OpacityIcon',
+    color: '#0288d1',
+    frequency: 'по показаниям',
+    order: 8,
+  },
+  {
+    id: 'hemostasis',
+    name: 'Коагулограмма',
+    description: 'Гемостазиограмма: свёртываемость крови',
+    icon: 'ScienceIcon',
+    color: '#6a1b9a',
+    frequency: 'по показаниям',
+    order: 9,
+  },
 ];
 
 // Получение категории по ID

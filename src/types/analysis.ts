@@ -8,7 +8,9 @@ export type CategoryType =
   | 'vitamins' // Витамины
   | 'gynecology' // Гинекологические анализы
   | 'ultrasound' // УЗИ исследования
-  | 'cytology'; // Цитологические исследования
+  | 'cytology' // Цитологические исследования
+  | 'urinalysis' // Клинический анализ мочи'
+  | 'hemostasis'; // Коагулограмма
 
 // Статус результата относительно нормы
 export type NormalStatus = 'normal' | 'high' | 'low' | 'attention';
